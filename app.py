@@ -21,7 +21,7 @@ from logic import (
 )
 from PIL import Image
 
-st.set_page_config(page_title="먹을까 말까", page_icon="🍗", layout="centered")
+st.set_page_config(page_title="먹을까 말까", page_icon="🍪", layout="centered")
 
 FONT_PATH = "NanumGothic.ttf"
 if not os.path.isfile(FONT_PATH):
@@ -61,6 +61,8 @@ if "candidates" not in st.session_state:
     st.session_state.candidates = []
 if "search_note" not in st.session_state:
     st.session_state.search_note = ""
+if "food_cart" not in st.session_state:
+    st.session_state.food_cart = []
 
 
 def go(page):
@@ -89,76 +91,84 @@ def show_candidate_dialog(none_option):
 # ---------- 로그인 화면 ----------
 
 def render_login():
-    st.markdown("### 🍗 먹을까 말까")
-    st.markdown("### 로그인")
+    left, center, right = st.columns([1, 1.2, 1])
+    with center:
+        st.markdown("<div style='text-align:center; font-size:3rem; margin-top:60px;'>🍪</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center; font-size:1.5rem; font-weight:800;'>먹을까 말까</div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center; color:#a0785a; font-size:0.9rem; margin-bottom:20px;'>참을까 말까 고민되는 순간, 함께해요</div>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin-bottom:20px;'>", unsafe_allow_html=True)
 
-    nickname = st.text_input("닉네임", key="login_nickname")
-    pin = st.text_input("PIN (숫자 4자리)", type="password", key="login_pin")
+        nickname = st.text_input("닉네임", key="login_nickname")
+        pin = st.text_input("PIN (숫자 4자리)", type="password", key="login_pin")
 
-    if st.button("로그인", type="primary"):
-        profile, msg = login_user(nickname, pin)
-        if profile:
-            st.session_state.nickname = nickname
-            st.session_state.goal_weight = profile["목표체중"]
-            st.session_state.character = profile["캐릭터"]
-            st.query_params["user"] = nickname
-            go("main")
-        else:
-            st.warning(msg)
+        if st.button("로그인", type="primary", use_container_width=True):
+            profile, msg = login_user(nickname, pin)
+            if profile:
+                st.session_state.nickname = nickname
+                st.session_state.goal_weight = profile["목표체중"]
+                st.session_state.character = profile["캐릭터"]
+                st.query_params["user"] = nickname
+                go("main")
+            else:
+                st.warning(msg)
 
-    st.markdown("---")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("회원가입"):
-            go("register")
-    with col2:
-        if st.button("PIN 찾기"):
-            go("find_pin")
+        st.markdown("---")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("회원가입", use_container_width=True):
+                go("register")
+        with col2:
+            if st.button("PIN 찾기", use_container_width=True):
+                go("find_pin")
 
 
 # ---------- 회원가입 화면 ----------
 
 def render_register():
-    st.markdown("### 회원가입")
+    left, center, right = st.columns([1, 1.2, 1])
+    with center:
+        st.markdown("<div style='text-align:center; font-size:1.2rem; font-weight:bold; margin-top:40px; margin-bottom:16px;'>회원가입</div>", unsafe_allow_html=True)
 
-    nickname = st.text_input("닉네임", key="reg_nickname")
-    pin = st.text_input("PIN (숫자 4자리)", type="password", key="reg_pin")
-    question = st.selectbox("보안질문", ["최애 음식은?", "가장 좋아하는 운동은?", "어릴 때 별명은?"])
-    answer = st.text_input("답변", key="reg_answer")
-    goal_weight = st.number_input("목표 체중(kg)", min_value=0.0, value=None)
-    character_type = st.selectbox("키울 캐릭터를 골라주세요", list(CHARACTER_TYPES.keys()))
-    st.caption("".join(CHARACTER_TYPES[character_type]) + "  ← 이렇게 자라나요")
+        nickname = st.text_input("닉네임", key="reg_nickname")
+        pin = st.text_input("PIN (숫자 4자리)", type="password", key="reg_pin")
+        question = st.selectbox("보안질문", ["최애 음식은?", "가장 좋아하는 운동은?", "어릴 때 별명은?"])
+        answer = st.text_input("답변", key="reg_answer")
+        goal_weight = st.number_input("목표 체중(kg)", min_value=0.0, value=None)
+        character_type = st.selectbox("키울 캐릭터를 골라주세요", list(CHARACTER_TYPES.keys()))
+        st.caption("".join(CHARACTER_TYPES[character_type]) + "  ← 이렇게 자라나요")
 
-    if st.button("가입하기", type="primary"):
-        msg = register_user(nickname, pin, question, answer, goal_weight, character_type)
-        st.info(msg)
+        if st.button("가입하기", type="primary", use_container_width=True):
+            msg = register_user(nickname, pin, question, answer, goal_weight, character_type)
+            st.info(msg)
 
-    if st.button("← 로그인으로 돌아가기"):
-        go("login")
+        if st.button("← 로그인으로 돌아가기", use_container_width=True):
+            go("login")
 
 
 # ---------- PIN 찾기 화면 ----------
 
 def render_find_pin():
-    st.markdown("### PIN 찾기")
+    left, center, right = st.columns([1, 1.2, 1])
+    with center:
+        st.markdown("<div style='text-align:center; font-size:1.2rem; font-weight:bold; margin-top:40px; margin-bottom:16px;'>PIN 찾기</div>", unsafe_allow_html=True)
 
-    nickname = st.text_input("닉네임", key="find_nickname")
+        nickname = st.text_input("닉네임", key="find_nickname")
 
-    if st.button("보안질문 확인"):
-        question, msg = get_security_question(nickname)
-        st.session_state.find_question = question
-        if msg:
-            st.warning(msg)
+        if st.button("보안질문 확인", use_container_width=True):
+            question, msg = get_security_question(nickname)
+            st.session_state.find_question = question
+            if msg:
+                st.warning(msg)
 
-    if st.session_state.get("find_question"):
-        st.markdown(f"**질문: {st.session_state.find_question}**")
-        answer = st.text_input("답변", key="find_answer")
-        if st.button("확인", type="primary"):
-            result = verify_and_show_pin(nickname, answer)
-            st.info(result)
+        if st.session_state.get("find_question"):
+            st.markdown(f"**질문: {st.session_state.find_question}**")
+            answer = st.text_input("답변", key="find_answer")
+            if st.button("확인", type="primary", use_container_width=True):
+                result = verify_and_show_pin(nickname, answer)
+                st.info(result)
 
-    if st.button("← 로그인으로 돌아가기"):
-        go("login")
+        if st.button("← 로그인으로 돌아가기", use_container_width=True):
+            go("login")
 
 
 # ---------- 메인 화면 ----------
@@ -167,7 +177,7 @@ def render_main():
     nickname = st.session_state.nickname
     header_col, logout_col = st.columns([4, 1])
     with header_col:
-        st.markdown(f"### 🍗 먹을까 말까 — {nickname}님")
+        st.markdown(f"### 🍪 먹을까 말까 — {nickname}님")
     with logout_col:
         if st.button("로그아웃"):
             st.query_params.clear()
@@ -175,7 +185,7 @@ def render_main():
             st.session_state.nickname = ""
             st.rerun()
 
-    tab1, tab2, tab3 = st.tabs(["오늘의 유혹", "기록 보기", "🏆 랭킹"])
+    tab1, tab2, tab3 = st.tabs(["🍪 먹을까 말까", "기록 보기", "🏆 랭킹"])
 
     with tab1:
         level, xp, remaining, emoji, stage_name, equipped_name, equipped_rarity, boost_ratio, hours_left = get_pet_status(nickname, st.session_state.character)
@@ -320,6 +330,68 @@ def render_main():
 
         amount_g = st.number_input(f"섭취량({unit})", min_value=0.0, value=100.0,
                                      help=f"100{unit} 기준 검색결과를 이 양만큼 환산해요 (직접입력엔 적용 안 됨)")
+
+        def resolve_current_selection():
+            if selected_candidate:
+                base_name, base_kcal, basis = parse_candidate(selected_candidate)
+                carb0, protein0, fat0 = get_macros_for_row(base_name)
+                ratio = amount_g / 100
+                item_calorie = round(base_kcal * ratio, 1)
+                item_carb = round(carb0 * ratio, 1)
+                item_protein = round(protein0 * ratio, 1)
+                item_fat = round(fat0 * ratio, 1)
+                shown_name = st.session_state.get("search_query") or base_name
+                item_name = f"{shown_name} ({amount_g}{'ml' if 'ml' in basis else 'g'})"
+                item_note = f"⚠️ {shown_name}: 원래 기준량이 {basis}이라 g 환산이 정확하지 않을 수 있어요" if "100g" not in basis else ""
+                return {"name": item_name, "calorie": item_calorie, "carb": item_carb,
+                        "protein": item_protein, "fat": item_fat, "is_manual": False, "note": item_note}
+            elif manual_name and manual_kcal is not None:
+                ai_est = st.session_state.get("ai_estimate")
+                ai_name = st.session_state.get("ai_estimate_name")
+                if ai_est and manual_name == ai_name:
+                    item_carb = ai_est.get("탄수화물", 0)
+                    item_protein = ai_est.get("단백질", 0)
+                    item_fat = ai_est.get("지방", 0)
+                    item_note = ""
+                    has_macro_data = True
+                else:
+                    item_carb = item_protein = item_fat = 0
+                    item_note = f"⚠️ {manual_name}: 탄단지 정보 없음(직접입력)"
+                    has_macro_data = False
+                return {"name": manual_name, "calorie": manual_kcal, "carb": item_carb, "protein": item_protein,
+                        "fat": item_fat, "is_manual": not has_macro_data, "note": item_note}
+            return None
+
+        def clear_search_state():
+            st.session_state.candidates = []
+            st.session_state.search_note = ""
+            st.session_state.selected_candidate_value = None
+            st.session_state.show_fallback_flag = False
+            st.session_state.search_query = ""
+            for k in ["ai_estimate", "ai_estimate_name", "recognized_name"]:
+                st.session_state.pop(k, None)
+
+        if st.button("🛒 장바구니에 담기"):
+            resolved = resolve_current_selection()
+            if resolved:
+                st.session_state.food_cart.append(resolved)
+                clear_search_state()
+                st.rerun()
+            else:
+                st.warning("⚠️ 검색 결과에서 선택하거나, 이름+칼로리를 직접 입력해주세요.")
+
+        if st.session_state.food_cart:
+            st.markdown("#### 🛒 담은 음식")
+            cart_total = sum(item["calorie"] for item in st.session_state.food_cart)
+            for i, item in enumerate(st.session_state.food_cart):
+                c_left, c_right = st.columns([5, 1])
+                c_left.markdown(f"- {item['name']} — {item['calorie']}kcal")
+                if c_right.button("❌", key=f"remove_cart_{i}"):
+                    st.session_state.food_cart.pop(i)
+                    st.rerun()
+            st.markdown(f"**합계: {cart_total}kcal**")
+            st.caption("여러 음식을 계속 검색해서 담을 수 있어요 (예: 치킨 + 제로콜라)")
+
         weight_kg = st.number_input("오늘 체중(kg)", min_value=0.0,
                                       value=None, key="main_weight")
         exercise = st.selectbox(
@@ -354,33 +426,30 @@ def render_main():
             elif not exercise:
                 st.warning("⚠️ 운동 종류를 선택해주세요.")
             else:
-                basis_note = ""
-                display_name = None
-                is_manual_entry = False
-                if selected_candidate:
-                    base_name, base_kcal, basis = parse_candidate(selected_candidate)
-                    carb0, protein0, fat0 = get_macros_for_row(base_name)
-                    ratio = amount_g / 100
-                    calorie = round(base_kcal * ratio, 1)
-                    carb = round(carb0 * ratio, 1)
-                    protein = round(protein0 * ratio, 1)
-                    fat = round(fat0 * ratio, 1)
-                    shown_name = st.session_state.get("search_query") or base_name
-                    display_name = f"{shown_name} ({amount_g}{'ml' if 'ml' in basis else 'g'})"
-                    if "100g" not in basis:
-                        basis_note = f"⚠️ 원래 기준량이 {basis}이라 g 환산이 정확하지 않을 수 있어요"
-                elif manual_name and manual_kcal is not None:
-                    display_name, calorie = manual_name, manual_kcal
-                    carb, protein, fat = 0, 0, 0
-                    is_manual_entry = True
-                else:
-                    st.warning("⚠️ 검색 결과에서 선택하거나, 이름+칼로리를 직접 입력해주세요.")
+                items = list(st.session_state.food_cart)
+                current = resolve_current_selection()
+                if current:
+                    items.append(current)
 
-                if display_name:
+                if not items:
+                    st.warning("⚠️ 음식을 검색해서 장바구니에 담거나, 이름+칼로리를 직접 입력해주세요.")
+                else:
+                    display_name = ", ".join(item["name"] for item in items)
+                    calorie = round(sum(item["calorie"] for item in items), 1)
+                    carb = round(sum(item["carb"] for item in items), 1)
+                    protein = round(sum(item["protein"] for item in items), 1)
+                    fat = round(sum(item["fat"] for item in items), 1)
+                    has_any_macro_data = any(not item["is_manual"] for item in items)
+                    has_missing_macro_data = any(item["is_manual"] for item in items)
+                    basis_note = " / ".join(item["note"] for item in items if item["note"])
+
                     minutes = calc_minutes(calorie, exercise, weight_kg)
                     comment = generate_comment(reason, display_name, calorie, exercise, minutes, ate, mode)
                     save_record(nickname, display_name, calorie, ate, reason,
                                 reason, exercise, minutes, comment)
+
+                    st.session_state.food_cart = []
+                    clear_search_state()
 
                     milestone_result = check_daily_milestone(nickname) if not ate else None
 
@@ -407,11 +476,13 @@ def render_main():
                         st.balloons()
                         st.success(f"🎊 오늘 {milestone_count}번째 참음 달성! **레전드 등급** 보너스 아이템 {milestone_item}을(를) 획득했어요!")
 
-                    if not is_manual_entry:
+                    if has_any_macro_data:
                         c1, c2, c3 = st.columns(3)
                         c1.metric("탄수화물", f"{carb}g", f"{int(carb_p*100)}%")
                         c2.metric("단백질", f"{protein}g", f"{int(protein_p*100)}%")
                         c3.metric("지방", f"{fat}g", f"{int(fat_p*100)}%")
+                        if has_missing_macro_data:
+                            st.caption("⚠️ 일부 음식은 탄단지 정보가 없어 합계에서 제외됐어요 (칼로리만 반영)")
 
                     st.markdown(f"{EXERCISE_EMOJIS.get(exercise, '🏃')} **{exercise}** 기준 **{minutes}분**")
                     st.markdown(f"🧘 오늘 컨디션: {condition_choice[0]} {condition}")
