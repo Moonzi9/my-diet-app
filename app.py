@@ -7,7 +7,7 @@ import calendar as cal_module
 import pandas as pd
 from datetime import datetime
 
-from config import MET_TABLE, CHARACTER_TYPES, CONDITION_OPTIONS, REASON_CATEGORIES, EXERCISE_EMOJIS, EXERCISE_VIDEOS, LEVEL_XP_PER_LEVEL, MILESTONE_THRESHOLDS, XP_RESIST, RARITY_BOOST, ITEM_EFFECT_DURATION_HOURS
+from config import MET_TABLE, CHARACTER_TYPES, CONDITION_OPTIONS, REASON_CATEGORIES, EXERCISE_EMOJIS, EXERCISE_VIDEOS, LEVEL_XP_PER_LEVEL, MILESTONE_THRESHOLDS, XP_RESIST, RARITY_BOOST, ITEM_EFFECT_DURATION_HOURS, CSV_FILE, PROFILE_FILE, ATTENDANCE_FILE, MILESTONE_FILE, EQUIPPED_FILE, BONUS_XP_FILE
 from logic import (
     register_user, login_user, get_security_question, verify_and_show_pin, get_profile,
     do_search, parse_candidate, get_macros_for_row, calc_macro_ratio,
@@ -508,6 +508,23 @@ def render_main():
                         st.caption(f"영상이 재생되지 않으면 [여기서 직접 찾아보기]({search_url})")
 
     with tab2:
+        with st.expander("💾 데이터 백업 (GitHub에 올려서 데이터 유지하기)"):
+            st.caption("코드를 수정해서 GitHub에 Commit하면 서버가 새로 만들어지면서 지금까지의 회원가입/기록 데이터가 사라져요. 코드 수정 전에 아래에서 백업 파일을 받아서, GitHub 저장소에 같이 올려두면 데이터가 유지돼요.")
+            backup_files = {
+                "회원 정보": PROFILE_FILE,
+                "참음/먹음 기록": CSV_FILE,
+                "출석/아이템": ATTENDANCE_FILE,
+                "마일스톤": MILESTONE_FILE,
+                "장착 아이템": EQUIPPED_FILE,
+                "보너스 XP": BONUS_XP_FILE,
+            }
+            for label, filepath in backup_files.items():
+                if os.path.isfile(filepath):
+                    with open(filepath, "rb") as f:
+                        st.download_button(f"📥 {label} 다운로드 ({filepath})", f.read(), file_name=filepath, key=f"backup_{filepath}")
+                else:
+                    st.caption(f"{label}: 아직 파일 없음")
+
         period = st.radio("조회 기간", ["이번 주", "이번 달"], horizontal=True)
         if st.button("🔄 조회"):
             df, stats = get_period_records(period, nickname)
